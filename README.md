@@ -21,16 +21,25 @@ El proyecto fue realizado como actividad académica aplicando los conceptos fund
 ---
 
 ## 🧱 Estructura del Proyecto
-lib/
-└── src/
-├── app.dart
-├── routes/
-├── screens/
-│ ├── login/
-│ ├── inventory/
-│ └── settings/
-├── themes/
-└── widgets/
+
+- lib/
+- ├── main.dart
+- └── src/
+-       ├── app.dart
+-       ├── routes/
+-       │   └── app_router.dart
+-       ├── screens/
+-       │   ├── login/
+-       │   │     └── login_screen.dart
+-       │   ├── inventory/
+-       │   │     └── inventory_screen.dart
+-       │   └── settings/
+-       │       ├── settings_screen.dart
+-       │       ├── theme_screen.dart
+-       │       ├── language_screen.dart
+-       │       └── profile_screen.dart
+-       └── themes/
+-           └── app_theme.dart
 
 
 La aplicación fue organizada de forma modular para facilitar mantenimiento y escalabilidad.
@@ -82,7 +91,8 @@ El cambio se realiza dinámicamente desde el menú "Temas".
 
 1. Clonar repositorio
 
-[text](https://github.com/OtoOcar/Flutter_Basico.git)
+[URL Repositorio](https://github.com/OtoOcar/Flutter_Basico.git)
+https://github.com/OtoOcar/Flutter_Basico.git
 
 
 2. Entrar al proyecto
