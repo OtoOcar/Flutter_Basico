@@ -80,6 +80,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               if (value == 'theme') context.push('/theme');
               if (value == 'language') context.push('/language');
               if (value == 'profile') context.push('/profile');
+              if (value == 'about') context.push('/about');
               if (value == 'logout') context.go('/');
             },
             itemBuilder: (context) => const [
@@ -87,6 +88,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               PopupMenuItem(value: 'theme', child: Text('Temas')),
               PopupMenuItem(value: 'language', child: Text('Idioma')),
               PopupMenuItem(value: 'profile', child: Text('Perfil')),
+              PopupMenuItem(value: 'about', child: Text('Acerca de')),
               PopupMenuItem(value: 'logout', child: Text('Cerrar sesión')),
             ],
           ),

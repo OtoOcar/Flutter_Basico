@@ -72,6 +72,17 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
+
+              const SizedBox(height: 50),
+
+              //Botón Acerca de
+              TextButton.icon(
+                onPressed: () {
+                  context.push('/about');
+                },
+                icon: const Icon(Icons.info_outline),
+                label: const Text('Acerca de la aplicación'),
+              ),
             ],
           ),
         ),
