@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'dart:io'; // Necesario para cerrar la app con exit(0)
+import '../../controllers/auth_controller.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -8,6 +11,8 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextEditingController userController = TextEditingController();
     final TextEditingController passController = TextEditingController();
+    // Se obtiene el controlador de autenticación
+    final authController = context.watch<AuthController>();
 
     return Scaffold(
       body: Center(
@@ -51,6 +56,14 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
 
+              // Muestra mensaje de error si existe
+              if (authController.errorMessage != null)
+                Text(
+                  authController.errorMessage!,
+                  style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+
               const SizedBox(height: 15),
 
               // Mensaje informativo
@@ -67,7 +80,19 @@ class LoginScreen extends StatelessWidget {
                 child: SizedBox(
                   width: 125,
                   child: ElevatedButton(
-                    onPressed: () => context.go('/inventory'),
+                    // Valida usando el controlador
+                    onPressed: () {
+                      final user = userController.text;
+                      final pass = passController.text;
+
+                      final isValid = authController.login(user, pass);
+
+                      // Si pasa validación, navega
+                      if (isValid) {
+                        // Se envía el usuario como parámetro en la navegación
+                        context.go('/inventory', extra: user);
+                      }
+                    },
                     child: const Text('Ingresar'),
                   ),
                 ),
@@ -82,6 +107,16 @@ class LoginScreen extends StatelessWidget {
                 },
                 icon: const Icon(Icons.info_outline),
                 label: const Text('Acerca de la aplicación'),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Botón para cerrar la aplicación
+              TextButton(
+                onPressed: () {
+                  exit(0); // Finaliza completamente la app
+                },
+                child: const Text('Cerrar App'),
               ),
             ],
           ),
