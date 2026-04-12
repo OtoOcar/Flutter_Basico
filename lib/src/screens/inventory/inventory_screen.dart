@@ -1,47 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:io'; // Necesario para exit(0)
+import '../../controllers/inventory_controller.dart';
 
+/*
+// Pantalla de inventario
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
+*/
+
+// Pantalla de inventario capturando Nombre de Usuario
+class InventoryScreen extends StatefulWidget {
+  final String usuario;
+
+  const InventoryScreen({super.key, required this.usuario});
 
   @override
   State<InventoryScreen> createState() => _InventoryScreenState();
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
-  String selectedRound = 'Vuelta 1';
-  int qrCount = 0;
-
+  // Controladores de texto
   final TextEditingController locationController = TextEditingController();
   final TextEditingController qrController = TextEditingController();
+
+  // Control de foco
   final FocusNode qrFocusNode = FocusNode();
-  final List<String> rounds = ['Vuelta 1', 'Vuelta 2', 'Vuelta 3', 'Reconteo'];
 
-  // Contador de entradas
-  void addQr() {
-    if (qrController.text.trim().isNotEmpty) {
-      setState(() {
-        qrCount++;
-      });
-      qrController.clear();
-
-      //vuelve a enfocar automáticamente
-      FocusScope.of(context).requestFocus(qrFocusNode);
-    }
-  }
-
-  // Acción del botón "Limpiar" (y confirmar guardado)
-  void refreshScreen() {
-    setState(() {
-      qrCount = 0;
-      selectedRound = 'Vuelta 1';
-    });
-    qrController.clear();
-    locationController.clear();
-  }
-
-  // Confirmación de guardado
-  void saveData() async {
+  // Diálogo de confirmación para guardar datos
+  void saveData(BuildContext context, InventoryController controller) async {
     final result = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -61,18 +49,83 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
 
     if (result == true) {
-      refreshScreen();
+      // Aquí en el futuro puedes exportar a CSV antes de limpiar
+      controller.reset();
+      qrController.clear();
+      locationController.clear();
+    }
+  }
+
+  // Diálogo de confirmación para limpiar datos
+  void confirmReset(InventoryController controller) async {
+    final result = await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Confirmación'),
+        content: const Text(
+          '¿Desea limpiar los datos? \nSe perderán las lecturas actuales.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Limpiar'),
+          ),
+        ],
+      ),
+    );
+
+    // Si el usuario confirma, se limpia el estado
+    if (result == true) {
+      controller.reset();
+      qrController.clear();
+      locationController.clear();
     }
   }
 
   @override
+  void dispose() {
+    // Liberación de memoria (Buena práctica)
+    locationController.dispose();
+    qrController.dispose();
+    qrFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Escucha cambios del controlador
+    final controller = context.watch<InventoryController>();
+
     return Scaffold(
       appBar: AppBar(
-        // Título
-        title: const Text('Inventario Segundas'),
+        toolbarHeight: 100,
+        // Título con icono y nombre de usuario
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center, // centra verticalmente
+          children: [
+            Row(
+              children: const [
+                Icon(Icons.inventory_2, size: 20),
+                SizedBox(width: 8),
+                Text('Inventario Segundas', style: TextStyle(fontSize: 24)),
+              ],
+            ),
 
-        // Menú desplegable con navegación
+            const SizedBox(height: 10),
+
+            Text(
+              'Usuario ${widget.usuario}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+            ),
+          ],
+        ),
+
+        // Menú de navegación
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -82,6 +135,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               if (value == 'profile') context.push('/profile');
               if (value == 'about') context.push('/about');
               if (value == 'logout') context.go('/');
+              if (value == 'exit') exit(0); // Finaliza la ejecución de la app
             },
             itemBuilder: (context) => const [
               PopupMenuItem(value: 'settings', child: Text('Configuración')),
@@ -90,11 +144,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
               PopupMenuItem(value: 'profile', child: Text('Perfil')),
               PopupMenuItem(value: 'about', child: Text('Acerca de')),
               PopupMenuItem(value: 'logout', child: Text('Cerrar sesión')),
+              PopupMenuItem(value: 'exit', child: Text('Cerrar App')),
             ],
           ),
         ],
       ),
 
+      //Cuerpo
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(26),
         child: Column(
@@ -102,21 +158,24 @@ class _InventoryScreenState extends State<InventoryScreen> {
           children: [
             const SizedBox(height: 20),
 
-            // Selección de vuelta
-            DropdownButtonFormField<String>(
-              value: selectedRound,
-              decoration: const InputDecoration(
-                labelText: 'Seleccione vuelta',
-                border: OutlineInputBorder(),
+            // Selector de vuelta de inventario
+            // Se usa initialValue en lugar de value (según nuevas versiones de Flutter)
+            SizedBox(
+              width: double.infinity, // mantiene alineación
+              child: DropdownButtonFormField<String>(
+                key: ValueKey(controller.selectedRound),
+                initialValue: controller.selectedRound,
+                decoration: const InputDecoration(
+                  labelText: 'Seleccione vuelta',
+                  border: OutlineInputBorder(),
+                ),
+                items: controller.rounds.map((round) {
+                  return DropdownMenuItem(value: round, child: Text(round));
+                }).toList(),
+                onChanged: (value) {
+                  controller.changeRound(value!);
+                },
               ),
-              items: rounds.map((round) {
-                return DropdownMenuItem(value: round, child: Text(round));
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedRound = value!;
-                });
-              },
             ),
 
             const SizedBox(height: 20),
@@ -132,7 +191,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
             const SizedBox(height: 20),
 
-            // Campo lectura QR
+            // Campo QR
             TextField(
               controller: qrController,
               focusNode: qrFocusNode,
@@ -140,12 +199,16 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 labelText: 'Lectura QR',
                 border: OutlineInputBorder(),
               ),
-              onSubmitted: (_) => addQr(),
+              onSubmitted: (value) {
+                controller.addQr(value);
+                qrController.clear();
+                FocusScope.of(context).requestFocus(qrFocusNode);
+              },
             ),
 
             const SizedBox(height: 20),
 
-            // Contador dinámico
+            // Contador
             Center(
               child: Card(
                 elevation: 4,
@@ -153,13 +216,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      const Text(
-                        'Cantidad de QR leídos',
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      const Text('Cantidad de QR leídos'),
                       const SizedBox(height: 10),
                       Text(
-                        '$qrCount',
+                        '${controller.qrCount}',
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -173,19 +233,57 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
             const SizedBox(height: 20),
 
-            // Botones guardar y limpiar
+            // Historial de QR leídos
+            const Text(
+              'Historial de lecturas',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Lista dinámica
+            // Contenedor del historial de lecturas
+            SizedBox(
+              height: 200, // altura fija para evitar que crezca indefinidamente
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey), // borde del cuadro
+                  borderRadius: BorderRadius.circular(
+                    8,
+                  ), // esquinas redondeadas
+                ),
+                child: controller.qrList.isEmpty
+                    // Mensaje cuando no hay datos
+                    ? const Center(child: Text('No hay lecturas registradas'))
+                    // Lista de QR leídos
+                    : ListView.builder(
+                        itemCount: controller.qrList.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            dense: true, // hace la lista más compacta
+                            leading: const Icon(Icons.qr_code),
+                            title: Text(controller.qrList[index]),
+                          );
+                        },
+                      ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Botones
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: saveData,
+                    onPressed: () => saveData(context, controller),
                     child: const Text('Guardar'),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: refreshScreen,
+                    onPressed: () => confirmReset(controller),
                     child: const Text('Limpiar'),
                   ),
                 ),
