@@ -5,8 +5,9 @@ import 'themes/app_theme.dart';
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // Notificador global del tema actual
   static final ValueNotifier<ThemeMode> themeNotifier =
-      ValueNotifier(ThemeMode.dark);
+      ValueNotifier(ThemeMode.dark); // Inicia en modo oscuro
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +17,9 @@ class MyApp extends StatelessWidget {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           routerConfig: appRouter,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: currentMode,
+          theme: AppTheme.lightTheme,     // Tema claro
+          darkTheme: AppTheme.darkTheme,  // Tema oscuro
+          themeMode: currentMode,         // Tema activo
         );
       },
     );
