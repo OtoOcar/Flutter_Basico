@@ -22,7 +22,7 @@ class ThemeScreen extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
-                MyApp.themeNotifier.value = ThemeMode.dark;
+                MyApp.themeNotifier.value = ThemeMode.dark; // Aplica tema oscuro
               },
               child: const Text('Tema Oscuro'),
             ),
@@ -31,7 +31,7 @@ class ThemeScreen extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
-                MyApp.themeNotifier.value = ThemeMode.light;
+                MyApp.themeNotifier.value = ThemeMode.light;  // Aplica tema claro
               },
               child: const Text('Tema Claro'),
             ),

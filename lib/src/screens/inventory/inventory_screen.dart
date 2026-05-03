@@ -25,7 +25,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController qrController = TextEditingController();
 
-  // Control de foco
+  // Control de foco para el campo QR
   final FocusNode qrFocusNode = FocusNode();
 
   // Diálogo de confirmación para guardar datos
@@ -88,7 +88,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   @override
   void dispose() {
-    // Liberación de memoria (Buena práctica)
+    // Liberación de memoria (buena práctica obligatoria)
     locationController.dispose();
     qrController.dispose();
     qrFocusNode.dispose();
@@ -161,10 +161,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
             // Selector de vuelta de inventario
             // Se usa initialValue en lugar de value (según nuevas versiones de Flutter)
             SizedBox(
-              width: double.infinity, // mantiene alineación
+              width: double.infinity, // Ocupa todo el ancho disponible
               child: DropdownButtonFormField<String>(
-                key: ValueKey(controller.selectedRound),
-                initialValue: controller.selectedRound,
+                key: ValueKey(controller.selectedRound),  // Fuerza reconstrucción al cambiar
+                initialValue: controller.selectedRound,   // Valor inicial (reemplaza 'value' deprecado)
                 decoration: const InputDecoration(
                   labelText: 'Seleccione vuelta',
                   border: OutlineInputBorder(),
@@ -208,10 +208,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
             const SizedBox(height: 20),
 
-            // Contador
+            // Contador con Card personalizado
             Center(
               child: Card(
-                elevation: 4,
+                elevation: 4, // Sombra del card
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -247,10 +247,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
               height: 200, // altura fija para evitar que crezca indefinidamente
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey), // borde del cuadro
-                  borderRadius: BorderRadius.circular(
-                    8,
-                  ), // esquinas redondeadas
+                  border: Border.all(color: Colors.grey), // Borde personalizado
+                  borderRadius: BorderRadius.circular(8),   // Esquinas redondeadas
                 ),
                 child: controller.qrList.isEmpty
                     // Mensaje cuando no hay datos
