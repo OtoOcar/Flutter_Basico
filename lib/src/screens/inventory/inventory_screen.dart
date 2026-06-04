@@ -133,15 +133,17 @@ class _InventoryScreenState extends State<InventoryScreen> {
               if (value == 'theme') context.push('/theme');
               if (value == 'language') context.push('/language');
               if (value == 'profile') context.push('/profile');
+              if (value == 'novedades') context.push('/novedades');
               if (value == 'about') context.push('/about');
               if (value == 'logout') context.go('/');
-              if (value == 'exit') exit(0); // Finaliza la ejecución de la app
+              if (value == 'exit') exit(0);
             },
             itemBuilder: (context) => const [
               PopupMenuItem(value: 'settings', child: Text('Configuración')),
               PopupMenuItem(value: 'theme', child: Text('Temas')),
               PopupMenuItem(value: 'language', child: Text('Idioma')),
               PopupMenuItem(value: 'profile', child: Text('Perfil')),
+              PopupMenuItem(value: 'novedades', child: Text('Novedades')),
               PopupMenuItem(value: 'about', child: Text('Acerca de')),
               PopupMenuItem(value: 'logout', child: Text('Cerrar sesión')),
               PopupMenuItem(value: 'exit', child: Text('Cerrar App')),
@@ -163,8 +165,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
             SizedBox(
               width: double.infinity, // Ocupa todo el ancho disponible
               child: DropdownButtonFormField<String>(
-                key: ValueKey(controller.selectedRound),  // Fuerza reconstrucción al cambiar
-                initialValue: controller.selectedRound,   // Valor inicial (reemplaza 'value' deprecado)
+                key: ValueKey(
+                  controller.selectedRound,
+                ), // Fuerza reconstrucción al cambiar
+                initialValue: controller
+                    .selectedRound, // Valor inicial (reemplaza 'value' deprecado)
                 decoration: const InputDecoration(
                   labelText: 'Seleccione vuelta',
                   border: OutlineInputBorder(),
@@ -248,7 +253,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey), // Borde personalizado
-                  borderRadius: BorderRadius.circular(8),   // Esquinas redondeadas
+                  borderRadius: BorderRadius.circular(
+                    8,
+                  ), // Esquinas redondeadas
                 ),
                 child: controller.qrList.isEmpty
                     // Mensaje cuando no hay datos
