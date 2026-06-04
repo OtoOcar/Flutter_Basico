@@ -6,6 +6,7 @@ import '../screens/settings/theme_screen.dart';
 import '../screens/settings/language_screen.dart';
 import '../screens/settings/profile_screen.dart';
 import '../screens/about/about_screen.dart';
+import '../screens/novedades/novedades_screen.dart';
 
 // Configuración de rutas de la aplicación
 final GoRouter appRouter = GoRouter(
@@ -49,5 +50,10 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const ProfileScreen(),
     ),
     GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
+    // Pantalla de novedades (fotos y notas)
+    GoRoute(
+      path: '/novedades',
+      builder: (context, state) => const NovedadesScreen(),
+    ),
   ],
 );

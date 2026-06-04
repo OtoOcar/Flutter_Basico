@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'src/app.dart';
 import 'src/controllers/inventory_controller.dart';
 import 'src/controllers/auth_controller.dart';
+import 'src/controllers/novedades_controller.dart';
 
 void main() {
   /*
@@ -16,14 +17,13 @@ void main() {
     MultiProvider(
       providers: [
         // Controlador encargado de gestionar el estado del inventario
-        ChangeNotifierProvider(
-          create: (_) => InventoryController(),
-        ),
+        ChangeNotifierProvider(create: (_) => InventoryController()),
 
         // Controlador encargado de validar el inicio de sesión (login)
-        ChangeNotifierProvider(
-          create: (_) => AuthController(),
-        ),
+        ChangeNotifierProvider(create: (_) => AuthController()),
+        
+        // Controlador encargado de gestionar las novedades (fotos y notas)
+        ChangeNotifierProvider(create: (_) => NovedadesController()),
       ],
       child: const MyApp(),
     ),
